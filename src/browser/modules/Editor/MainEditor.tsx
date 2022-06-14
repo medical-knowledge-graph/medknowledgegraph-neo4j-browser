@@ -32,11 +32,23 @@ import {
   ExpandIcon,
   FavoriteIcon,
   FileIcon,
-  UpdateFileIcon,
-  RunIcon
+  RunIcon,
+  UpdateFileIcon
 } from 'browser-components/icons/LegacyIcons'
 import { isMac } from 'neo4j-arc/common'
 
+import {
+  FormButton,
+  FrameButton,
+  StyledEditorButton,
+  StyledMainEditorButtonsContainer
+} from 'browser-components/buttons'
+import {
+  ADD_PROJECT_FILE,
+  REMOVE_PROJECT_FILE
+} from 'browser-components/ProjectFiles/projectFilesConstants'
+import { getProjectFileDefaultFileName } from 'browser-components/ProjectFiles/projectFilesUtils'
+import { defaultNameFromDisplayContent } from 'browser-components/SavedScripts'
 import {
   CurrentEditIconContainer,
   EditorContainer,
@@ -45,18 +57,9 @@ import {
   MainEditorWrapper,
   ScriptTitle
 } from './styled'
-import {
-  ADD_PROJECT_FILE,
-  REMOVE_PROJECT_FILE
-} from 'browser-components/ProjectFiles/projectFilesConstants'
-import { getProjectFileDefaultFileName } from 'browser-components/ProjectFiles/projectFilesUtils'
-import { defaultNameFromDisplayContent } from 'browser-components/SavedScripts'
-import {
-  FrameButton,
-  StyledEditorButton,
-  StyledMainEditorButtonsContainer
-} from 'browser-components/buttons'
 
+import { base } from 'browser-styles/themes'
+import { NEO4J_BROWSER_USER_ACTION_QUERY } from 'services/bolt/txMetadata'
 import { GlobalState } from 'shared/globalState'
 import { getProjectId } from 'shared/modules/app/appDuck'
 import {
@@ -82,13 +85,14 @@ import {
   codeFontLigatures,
   shouldEnableMultiStatementMode
 } from 'shared/modules/settings/settingsDuck'
-import { base } from 'browser-styles/themes'
-import { NEO4J_BROWSER_USER_ACTION_QUERY } from 'services/bolt/txMetadata'
 
+import { H3 } from 'browser-components/headers'
 import {
   FULLSCREEN_SHORTCUT,
   printShortcut
 } from 'browser/modules/App/keyboardShortcuts'
+import styled from 'styled-components'
+import { StyledConnectionTextInput } from '../Stream/Auth/styled'
 
 type EditorFrameProps = {
   bus: Bus
@@ -100,6 +104,7 @@ type EditorFrameProps = {
   updateFavorite: (id: string, value: string) => void
   useDb: null | string
   params: Record<string, unknown>
+  isConnected: boolean
 }
 
 type SavedScript = {
@@ -111,10 +116,21 @@ type SavedScript = {
   name?: string
 }
 
+const StyledConnectionLabel = styled.label`
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 2;
+  * {
+    font-weight: normal;
+  }
+`
+
 export function MainEditor({
   bus,
   codeFontLigatures,
   enableMultiStatementMode,
+  isConnected,
   executeCommand,
   history,
   projectId,
@@ -268,6 +284,34 @@ export function MainEditor({
           {currentlyEditing.isStatic ? ' (read-only)' : ''}
         </ScriptTitle>
       )}
+
+      {isConnected && (
+        <>
+          <H3>{'Search for a disease'}</H3>
+          <StyledConnectionLabel htmlFor="url-input">
+            Disease
+          </StyledConnectionLabel>
+          <StyledConnectionTextInput
+            data-testid="boltaddress"
+            // onChange={() => console.log("onchange")}
+            // value={stripScheme(props.host)}
+            id="desia-input"
+          />
+          <FormButton
+            data-testid="connect"
+            type="submit"
+            style={{ marginRight: 0 }}
+          >
+            Search
+          </FormButton>
+          {/* <PredefinedQueryCard
+            title="Alle Disease anzeigen"
+            description="Diese Cypher-Query zeigt dir alle Disease: MATCH (n:Disease) RETURN n LIMIT 25"
+            cypher="MATCH (n:Disease) RETURN n LIMIT 25"
+          /> */}
+        </>
+      )}
+
       <FlexContainer>
         <Header>
           <EditorContainer>
@@ -377,7 +421,8 @@ const mapStateToProps = (state: GlobalState) => {
     history: getHistory(state),
     projectId: getProjectId(state),
     useDb: getUseDb(state),
-    params: getParams(state)
+    params: getParams(state),
+    isConnected: state.connections.connectionState === 1
   }
 }
 
