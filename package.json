@@ -35,7 +35,6 @@
     "jest-update": "jest --updateSnapshot",
     "lint": "eslint --fix --ext .ts --ext .tsx ./",
     "lint-quiet": "eslint --fix --ext .ts --ext .tsx ./ --quiet",
-    "precommit": "lint-staged",
     "prepare-jar": "node ./scripts/prepare-mvn-package.js",
     "generate-canary-manifest": "node ./scripts/convert-to-canary-manifest.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --colors --config ./build_scripts/webpack.config.js",
