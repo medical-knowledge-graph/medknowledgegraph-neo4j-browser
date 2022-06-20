@@ -171,7 +171,10 @@
   },
   "dependencies": {
     "@apollo/client": "^3.2.0",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@juggle/resize-observer": "^3.3.1",
+    "@mui/material": "^5.8.4",
     "@neo4j-ndl/base": "^0.1.2",
     "@neo4j-ndl/react": "^0.1.2",
     "@neo4j/browser-lambda-parser": "1.0.5",

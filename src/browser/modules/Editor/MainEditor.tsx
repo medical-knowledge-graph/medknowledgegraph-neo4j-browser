@@ -93,6 +93,7 @@ import {
 } from 'browser/modules/App/keyboardShortcuts'
 import styled from 'styled-components'
 import { StyledConnectionTextInput } from '../Stream/Auth/styled'
+import { Autocomplete, TextField } from '@mui/material'
 
 type EditorFrameProps = {
   bus: Bus
@@ -267,6 +268,42 @@ export function MainEditor({
 
   return (
     <MainEditorWrapper isFullscreen={isFullscreen} data-testid="activeEditor">
+      {isConnected && (
+        <>
+          <div style={{ padding: 8 }}>
+            <H3>{'Search for a disease'}</H3>
+            <StyledConnectionLabel htmlFor="url-input">
+              Disease
+            </StyledConnectionLabel>
+
+            <Autocomplete
+              freeSolo
+              id="free-solo-2-demo"
+              disableClearable
+              style={{ width: '30%', marginTop: 8 }}
+              options={['Phenylketonuric']}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Disease"
+                  InputProps={{
+                    ...params.InputProps,
+                    type: 'search'
+                  }}
+                />
+              )}
+            />
+
+            <FormButton
+              data-testid="connect"
+              type="submit"
+              style={{ marginRight: 0, marginTop: 8 }}
+            >
+              Search
+            </FormButton>
+          </div>
+        </>
+      )}
       {currentlyEditing && (
         <ScriptTitle data-testid="currentlyEditing" unsaved={showUnsaved}>
           {currentlyEditing.isProjectFile ? (
@@ -278,38 +315,12 @@ export function MainEditor({
               <FavoriteIcon width={12} />
             </CurrentEditIconContainer>
           )}
+
           {currentlyEditing.isProjectFile ? ' Project file: ' : ' Favorite: '}
           {getName(currentlyEditing)}
           {showUnsaved ? '*' : ''}
           {currentlyEditing.isStatic ? ' (read-only)' : ''}
         </ScriptTitle>
-      )}
-
-      {isConnected && (
-        <>
-          <H3>{'Search for a disease'}</H3>
-          <StyledConnectionLabel htmlFor="url-input">
-            Disease
-          </StyledConnectionLabel>
-          <StyledConnectionTextInput
-            data-testid="boltaddress"
-            // onChange={() => console.log("onchange")}
-            // value={stripScheme(props.host)}
-            id="desia-input"
-          />
-          <FormButton
-            data-testid="connect"
-            type="submit"
-            style={{ marginRight: 0 }}
-          >
-            Search
-          </FormButton>
-          {/* <PredefinedQueryCard
-            title="Alle Disease anzeigen"
-            description="Diese Cypher-Query zeigt dir alle Disease: MATCH (n:Disease) RETURN n LIMIT 25"
-            cypher="MATCH (n:Disease) RETURN n LIMIT 25"
-          /> */}
-        </>
       )}
 
       <FlexContainer>

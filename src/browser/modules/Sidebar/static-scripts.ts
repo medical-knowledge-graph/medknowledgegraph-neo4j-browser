@@ -40,6 +40,8 @@ const mapFavoritesStateToProps = (state: any) => {
         semver.satisfies(version, fav.versionRange)
     )
 
+  console.log('folders', folders)
+
   return {
     title: 'Sample Scripts',
     folders,
