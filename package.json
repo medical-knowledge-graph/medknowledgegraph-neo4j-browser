@@ -21,7 +21,7 @@
   "homepage": "https://neo4j.com/developer/guide-neo4j-browser/",
   "main": "dist/index.html",
   "scripts": {
-    "build": "cross-env NODE_ENV=\"production\" webpack --config ./build_scripts/webpack.config.js",
+    "build": "cross-env webpack --config ./build_scripts/webpack.config.js",
     "dev": "jest --watch",
     "e2e": "cypress run",
     "e2e-open": "cypress open",
@@ -35,7 +35,6 @@
     "jest-update": "jest --updateSnapshot",
     "lint": "eslint --fix --ext .ts --ext .tsx ./",
     "lint-quiet": "eslint --fix --ext .ts --ext .tsx ./ --quiet",
-    "precommit": "lint-staged",
     "prepare-jar": "node ./scripts/prepare-mvn-package.js",
     "generate-canary-manifest": "node ./scripts/convert-to-canary-manifest.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --colors --config ./build_scripts/webpack.config.js",
