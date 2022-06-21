@@ -94,6 +94,7 @@ import {
 import styled from 'styled-components'
 import { StyledConnectionTextInput } from '../Stream/Auth/styled'
 import { Autocomplete, TextField } from '@mui/material'
+import { staticDiseases } from 'browser/static/diseases'
 
 type EditorFrameProps = {
   bus: Bus
@@ -281,7 +282,7 @@ export function MainEditor({
               id="free-solo-2-demo"
               disableClearable
               style={{ width: '30%', marginTop: 8 }}
-              options={['Phenylketonuric']}
+              options={staticDiseases}
               renderInput={params => (
                 <TextField
                   {...params}

@@ -24,6 +24,24 @@ export const scripts = [
     content:
       "// Shortest path to gens \n MATCH (source:Gene {gene:'PAH'}), (target:Gene) CALL apoc.algo.dijkstra(source, target, 'CONTAINS', '') YIELD path RETURN *",
     versionRange: '>=3'
+  },
+  {
+    folder: 'queries',
+    content:
+      '// Diseases UMLS \n MATCH (d:DISEASE {text: "phenylketonuria"})-[]-(u:UMLS) RETURN d, u',
+    versionRange: '>=3'
+  },
+  {
+    folder: 'queries',
+    content:
+      '// Chemicals for Gen \n MATCH (c:CHEMICAL {text: "pah"}) RETURN c',
+    versionRange: '>=3'
+  },
+  {
+    folder: 'queries',
+    content:
+      '// Paper for Diseases \n MATCH (u:UMLS {name: "Phenylketonurias"})-[]-()-[]-(p:Paper) RETURN *',
+    versionRange: '>=3'
   }
 ]
 

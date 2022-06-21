@@ -114,6 +114,8 @@ export function initalizeCypherSupport(): void {
             }
           : range
 
+      console.log('itmems', items)
+
       return {
         suggestions: items.map((item, index) => {
           const label = getText(item)
