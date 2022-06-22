@@ -17,6 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { H3 } from './Headers'
+import { H3, H4 } from './Headers'
 
-export { H3 }
+export { H3, H4 }

@@ -86,14 +86,24 @@ import {
   shouldEnableMultiStatementMode
 } from 'shared/modules/settings/settingsDuck'
 
-import { H3 } from 'browser-components/headers'
+import { H3, H4 } from 'browser-components/headers'
 import {
   FULLSCREEN_SHORTCUT,
   printShortcut
 } from 'browser/modules/App/keyboardShortcuts'
 import styled from 'styled-components'
 import { StyledConnectionTextInput } from '../Stream/Auth/styled'
-import { Autocomplete, TextField } from '@mui/material'
+import {
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+  Box
+} from '@mui/material'
 import { staticDiseases } from 'browser/static/diseases'
 
 type EditorFrameProps = {
@@ -272,28 +282,101 @@ export function MainEditor({
       {isConnected && (
         <>
           <div style={{ padding: 8 }}>
-            <H3>{'Search for a disease'}</H3>
-            <StyledConnectionLabel htmlFor="url-input">
-              Disease
-            </StyledConnectionLabel>
+            <H3>{'Configure Graph'}</H3>
 
-            <Autocomplete
-              freeSolo
-              id="free-solo-2-demo"
-              disableClearable
-              style={{ width: '30%', marginTop: 8 }}
-              options={staticDiseases}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Disease"
-                  InputProps={{
-                    ...params.InputProps,
-                    type: 'search'
-                  }}
+            <H4 style={{ marginTop: 16 }}>1. Select Disease</H4>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Autocomplete
+                  freeSolo
+                  id="free-solo-2-demo"
+                  disableClearable
+                  style={{ width: '100%' }}
+                  options={staticDiseases}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Disease"
+                      InputProps={{
+                        ...params.InputProps,
+                        type: 'search'
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
+              </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  id="outlined-basic"
+                  label="Number of Articles"
+                  type="number"
+                  variant="outlined"
+                />
+              </Grid>
+            </Grid>
+            <H4 style={{ marginTop: 16 }}>2. Configure Pipelines</H4>
+            <Grid container spacing={2}>
+              <Grid item xs={3}>
+                <Paper style={{ padding: 16 }}>
+                  <Typography variant="h6">Pubmed</Typography>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="run" />}
+                      label="Run"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="jason" />}
+                      label="Meshterms"
+                    />
+                  </FormGroup>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper style={{ padding: 16 }}>
+                  <Typography variant="h6">NER</Typography>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="run" />}
+                      label="Run"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="jason" />}
+                      label="Entity Links"
+                    />
+                  </FormGroup>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper style={{ padding: 16 }}>
+                  <Typography variant="h6">MedGen</Typography>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="run" />}
+                      label="Run"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox defaultChecked name="snomed" />}
+                      label="Snomed"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox name="clinicalFeatures" />}
+                      label="Clinical Features"
+                    />
+                  </FormGroup>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper style={{ padding: 16 }}>
+                  <Typography variant="h6">uniProt</Typography>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox name="run" />}
+                      label="Run"
+                    />
+                  </FormGroup>
+                </Paper>
+              </Grid>
+            </Grid>
 
             <FormButton
               data-testid="connect"
