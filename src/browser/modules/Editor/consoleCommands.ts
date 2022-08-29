@@ -106,21 +106,16 @@ export default [
         description: ' - getting started with Neo4j Browser'
       },
       {
+        name: 'setup',
+        description: ' - setting up and make first request'
+      },
+      {
         name: 'concepts',
         description: ' - basic concepts to get you going'
       },
       {
         name: 'cypher',
         description: ' - basics: create, match, delete'
-      },
-      {
-        name: 'movies',
-        description:
-          '- queries and recommendations with Cypher - movie use case'
-      },
-      {
-        name: 'northwind',
-        description: ' - from RDBMS to Graph, using a classic dataset'
       }
     ]
   },

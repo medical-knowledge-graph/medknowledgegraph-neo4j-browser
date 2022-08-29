@@ -4,14 +4,12 @@ import { BinIcon } from 'browser-components/icons/LegacyIcons'
 
 import {
   DrawerBrowserCommand,
-  DrawerExternalLink,
   DrawerSubHeader
 } from 'browser-components/drawer/drawer-styled'
 import docs, { BuiltInGuideIdentifier, Guide } from 'browser/documentation'
 import {
   Clickable,
   GuideListEntry,
-  LinkContainer,
   MarginBottomLi,
   MarginTop,
   NoBulletsUl
@@ -30,19 +28,16 @@ const builtInGuides: {
   identifier: BuiltInGuideIdentifier
   description: string
 }[] = [
+  {
+    identifier: 'setup',
+    description:
+      'How to login and make your first steps to creating a medical knowledge graph.'
+  },
   { identifier: 'intro', description: 'Navigating Neo4j Browser' },
   { identifier: 'concepts', description: 'Property graph model concepts' },
   {
     identifier: 'cypher',
     description: 'Cypher basics - create, match, delete'
-  },
-  {
-    identifier: 'movie-graph',
-    description: 'Queries and recommendations with Cypher - movie use case}'
-  },
-  {
-    identifier: 'northwind-graph',
-    description: 'Translate and import relation data into graph'
   }
 ]
 
@@ -117,11 +112,6 @@ const GuidePicker = ({
         </NoBulletsUl>
       </>
     )}
-    <LinkContainer>
-      <DrawerExternalLink href="https://neo4j.com/graphgists/">
-        More guides
-      </DrawerExternalLink>
-    </LinkContainer>
   </BuiltInGuideSidebarSlide>
 )
 

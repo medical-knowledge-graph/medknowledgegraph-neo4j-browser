@@ -105,6 +105,7 @@ import {
   Box
 } from '@mui/material'
 import { staticDiseases } from 'browser/static/diseases'
+import { RequestConfig } from 'browser/models/pipeline-config'
 
 type EditorFrameProps = {
   bus: Bus
@@ -128,6 +129,10 @@ type SavedScript = {
   name?: string
 }
 
+interface PipelineConfiguration {
+  [key: string]: boolean
+}
+
 const StyledConnectionLabel = styled.label`
   display: block;
   font-size: 13px;
@@ -137,6 +142,29 @@ const StyledConnectionLabel = styled.label`
     font-weight: normal;
   }
 `
+
+const defaultRequestState: RequestConfig = {
+  disease: '',
+  numberOfArticles: 150,
+  pipelines: {
+    medGen: {
+      clinicalFeatures: true,
+      run: true,
+      Snomed: true
+    },
+    ner: {
+      entityLinks: true,
+      run: true
+    },
+    pubmed: {
+      meshTerms: true,
+      run: true
+    },
+    uniProt: {
+      run: true
+    }
+  }
+}
 
 export function MainEditor({
   bus,
@@ -156,6 +184,9 @@ export function MainEditor({
   const [currentlyEditing, setCurrentlyEditing] = useState<SavedScript | null>(
     null
   )
+  const [requestConfiguration, setRequestConfiguration] =
+    useState<RequestConfig>(defaultRequestState)
+
   const editorRef = useRef<CypherEditor>(null)
 
   const toggleFullscreen = () => {
@@ -277,6 +308,36 @@ export function MainEditor({
     !currentlyEditing?.isStatic
   )
 
+  const pipelineConfig = requestConfiguration.pipelines
+
+  const handleSubmit = () => {
+    const requestJSON = buildRequestJSON(requestConfiguration)
+    console.log('requestJSON', requestJSON)
+    ;(async () => {
+      const rawResponse = await fetch('https://dzkj.fordo.de/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: requestJSON
+      })
+      const content = await rawResponse.json()
+
+      console.log(content)
+    })()
+  }
+
+  const handlePipelineChange = (config: Object) => {
+    setRequestConfiguration({
+      ...requestConfiguration,
+      pipelines: {
+        ...requestConfiguration.pipelines,
+        ...config
+      }
+    })
+  }
+
   return (
     <MainEditorWrapper isFullscreen={isFullscreen} data-testid="activeEditor">
       {isConnected && (
@@ -293,10 +354,17 @@ export function MainEditor({
                   disableClearable
                   style={{ width: '100%' }}
                   options={staticDiseases}
+                  onChange={(evt, value) =>
+                    setRequestConfiguration({
+                      ...requestConfiguration,
+                      disease: value
+                    })
+                  }
                   renderInput={params => (
                     <TextField
                       {...params}
                       label="Disease"
+                      key={params.id}
                       InputProps={{
                         ...params.InputProps,
                         type: 'search'
@@ -310,7 +378,14 @@ export function MainEditor({
                   id="outlined-basic"
                   label="Number of Articles"
                   type="number"
+                  onChange={evt =>
+                    setRequestConfiguration({
+                      ...requestConfiguration,
+                      numberOfArticles: parseInt(evt.currentTarget.value)
+                    })
+                  }
                   variant="outlined"
+                  value={requestConfiguration.numberOfArticles}
                 />
               </Grid>
             </Grid>
@@ -321,11 +396,37 @@ export function MainEditor({
                   <Typography variant="h6">Pubmed</Typography>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="run" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.pubmed.run}
+                          name="run"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              pubmed: {
+                                ...requestConfiguration.pipelines.pubmed,
+                                run: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Run"
                     />
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="jason" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.pubmed.meshTerms}
+                          name="meshterms"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              pubmed: {
+                                ...requestConfiguration.pipelines.pubmed,
+                                meshTerms: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Meshterms"
                     />
                   </FormGroup>
@@ -336,11 +437,37 @@ export function MainEditor({
                   <Typography variant="h6">NER</Typography>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="run" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.ner.run}
+                          onChange={evt =>
+                            handlePipelineChange({
+                              ner: {
+                                ...requestConfiguration.pipelines.ner,
+                                run: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                          name="ner-run"
+                        />
+                      }
                       label="Run"
                     />
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="jason" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.ner.entityLinks}
+                          name="ner-entity-links"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              ner: {
+                                ...requestConfiguration.pipelines.ner,
+                                entityLinks: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Entity Links"
                     />
                   </FormGroup>
@@ -351,15 +478,54 @@ export function MainEditor({
                   <Typography variant="h6">MedGen</Typography>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="run" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.medGen.run}
+                          onChange={evt =>
+                            handlePipelineChange({
+                              medGen: {
+                                ...requestConfiguration.pipelines.medGen,
+                                run: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                          name="run"
+                        />
+                      }
                       label="Run"
                     />
                     <FormControlLabel
-                      control={<Checkbox defaultChecked name="snomed" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.medGen.Snomed}
+                          name="snomed"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              medGen: {
+                                ...requestConfiguration.pipelines.medGen,
+                                Snomed: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Snomed"
                     />
                     <FormControlLabel
-                      control={<Checkbox name="clinicalFeatures" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.medGen.clinicalFeatures}
+                          name="clinicalFeatures"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              medGen: {
+                                ...requestConfiguration.pipelines.medGen,
+                                clinicalFeatures: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Clinical Features"
                     />
                   </FormGroup>
@@ -370,7 +536,20 @@ export function MainEditor({
                   <Typography variant="h6">uniProt</Typography>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox name="run" />}
+                      control={
+                        <Checkbox
+                          checked={pipelineConfig.uniProt.run}
+                          name="run"
+                          onChange={evt =>
+                            handlePipelineChange({
+                              uniProt: {
+                                ...requestConfiguration.pipelines.uniProt,
+                                run: evt.currentTarget.checked
+                              }
+                            })
+                          }
+                        />
+                      }
                       label="Run"
                     />
                   </FormGroup>
@@ -381,6 +560,7 @@ export function MainEditor({
             <FormButton
               data-testid="connect"
               type="submit"
+              onClick={handleSubmit}
               style={{ marginRight: 0, marginTop: 8 }}
             >
               Search
@@ -533,3 +713,18 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>) => {
 }
 
 export default withBus(connect(mapStateToProps, mapDispatchToProps)(MainEditor))
+
+function buildRequestJSON(requestConfiguration: RequestConfig) {
+  const requestObject = {
+    requestSpecs: { ...requestConfiguration },
+    token: 'gTROnCD7nMeifPU'
+  }
+
+  let tempJSON = JSON.stringify(requestObject)
+
+  // adjust to needed string Format
+  tempJSON = tempJSON.replace('requestSpecs', 'request_specs')
+  tempJSON = tempJSON.replace('numberOfArticles', 'n_articles')
+
+  return tempJSON
+}
