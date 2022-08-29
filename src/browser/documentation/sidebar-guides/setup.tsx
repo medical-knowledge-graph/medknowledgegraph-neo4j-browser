@@ -102,7 +102,7 @@ const slides = [
     <img src="./assets/images/pipeline_config.png" className="img-responsive" />
     <br />
   </BuiltInGuideSidebarSlide>,
-  <BuiltInGuideSidebarSlide key="s3">
+  <BuiltInGuideSidebarSlide key="s4">
     <h3>Architecture and Pipelines</h3>
     <p className="lead">
       <em>
@@ -128,6 +128,26 @@ const slides = [
     </ul>
     <br />
     <img src="./assets/images/architecture.png" className="img-responsive" />
+    <br />
+  </BuiltInGuideSidebarSlide>,
+  <BuiltInGuideSidebarSlide key="s5">
+    <h3>Helpful Queries</h3>
+    <p className="lead">
+      <em>
+        We put together some helpful queries to get quickly get you started.
+      </em>
+    </p>
+    <p>
+      You can find the helpful queries at "Sample Scripts" inside the favorite
+      tab, marked with the star icon. Just select one and click on the blue play
+      button to execute it. Feel free to adjust the query to your needs. You
+      have to be logged in to access the queries.
+    </p>
+
+    <img
+      src="./assets/images/favorite_queries.png"
+      className="img-responsive"
+    />
     <br />
   </BuiltInGuideSidebarSlide>
 ]

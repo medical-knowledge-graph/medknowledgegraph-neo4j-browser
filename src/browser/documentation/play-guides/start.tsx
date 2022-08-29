@@ -25,6 +25,18 @@ const content = (
   <>
     <div className="teasers">
       <div className="teaser teaser-3">
+        <h3>Make your first request!</h3>
+        <p className="lead">
+          Everything you need to know, to get you started quickly. Learn about
+          the different pipelines and configuration options to build and
+          navigate through your own medical knowledge graph.
+        </p>
+
+        <button exec-topic="guide setup" className="btn btn-cta">
+          Open guide
+        </button>
+      </div>
+      <div className="teaser teaser-3">
         <h3>Getting started with Neo4j Browser</h3>
         <p className="lead">Neo4j Browser user interface guide</p>
         <div className="icon-holder">
@@ -35,19 +47,6 @@ const content = (
         </button>
       </div>
 
-      <div className="teaser teaser-3">
-        <h3>Try Neo4j with live data</h3>
-        <p className="lead">
-          A complete example graph that demonstrates common query patterns.
-        </p>
-        <div className="icon-holder">
-          <p>Actors & movies in cross-referenced pop culture.</p>
-          <div className="clearfix" />
-        </div>
-        <button exec-topic="guide movie-graph" className="btn btn-cta">
-          Open guide
-        </button>
-      </div>
       <div className="teaser teaser-3">
         <h3>Cypher basics</h3>
         <p className="lead">Intro to Graphs with Cypher </p>
