@@ -86,13 +86,6 @@ import {
   shouldEnableMultiStatementMode
 } from 'shared/modules/settings/settingsDuck'
 
-import { H3, H4 } from 'browser-components/headers'
-import {
-  FULLSCREEN_SHORTCUT,
-  printShortcut
-} from 'browser/modules/App/keyboardShortcuts'
-import styled from 'styled-components'
-import { StyledConnectionTextInput } from '../Stream/Auth/styled'
 import {
   Autocomplete,
   Checkbox,
@@ -101,11 +94,16 @@ import {
   Grid,
   Paper,
   TextField,
-  Typography,
-  Box
+  Typography
 } from '@mui/material'
-import { staticDiseases } from 'browser/static/diseases'
+import { H3, H4 } from 'browser-components/headers'
 import { RequestConfig } from 'browser/models/pipeline-config'
+import {
+  FULLSCREEN_SHORTCUT,
+  printShortcut
+} from 'browser/modules/App/keyboardShortcuts'
+import { staticDiseases } from 'browser/static/diseases'
+import styled from 'styled-components'
 
 type EditorFrameProps = {
   bus: Bus
@@ -180,6 +178,7 @@ export function MainEditor({
 }: EditorFrameProps): JSX.Element {
   const [addFile] = useMutation(ADD_PROJECT_FILE)
   const [unsaved, setUnsaved] = useState(false)
+  const [isRequestLoading, setIsRequestLoading] = useState(false)
   const [isFullscreen, setFullscreen] = useState(false)
   const [currentlyEditing, setCurrentlyEditing] = useState<SavedScript | null>(
     null
@@ -311,10 +310,10 @@ export function MainEditor({
   const pipelineConfig = requestConfiguration.pipelines
 
   const handleSubmit = () => {
+    setIsRequestLoading(true)
     const requestJSON = buildRequestJSON(requestConfiguration)
-    console.log('requestJSON', requestJSON)
     ;(async () => {
-      const rawResponse = await fetch('https://dzkj.fordo.de/', {
+      await fetch('https://dzkj.fordo.de/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -322,9 +321,8 @@ export function MainEditor({
         },
         body: requestJSON
       })
-      const content = await rawResponse.json()
 
-      console.log(content)
+      setIsRequestLoading(false)
     })()
   }
 
@@ -367,7 +365,12 @@ export function MainEditor({
                       key={params.id}
                       InputProps={{
                         ...params.InputProps,
-                        type: 'search'
+                        type: 'search',
+                        onChange: evt =>
+                          setRequestConfiguration({
+                            ...requestConfiguration,
+                            disease: evt.currentTarget.value
+                          })
                       }}
                     />
                   )}
@@ -560,10 +563,15 @@ export function MainEditor({
             <FormButton
               data-testid="connect"
               type="submit"
+              disabled={isRequestLoading || requestConfiguration.disease == ''}
               onClick={handleSubmit}
-              style={{ marginRight: 0, marginTop: 8 }}
+              style={{
+                marginRight: 0,
+                marginTop: 8,
+                backgroundColor: isRequestLoading ? 'grey' : undefined
+              }}
             >
-              Search
+              {isRequestLoading ? 'Creating Graph...' : 'Search'}
             </FormButton>
           </div>
         </>
