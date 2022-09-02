@@ -1,6 +1,8 @@
 export interface RequestConfig {
   disease: string
   numberOfArticles: number
+  deleteGraph: boolean
+  deleteGraphPassword: string
   pipelines: {
     pubmed: {
       run: boolean

@@ -87,15 +87,19 @@ import {
 } from 'shared/modules/settings/settingsDuck'
 
 import {
+  Alert,
   Autocomplete,
   Checkbox,
   FormControlLabel,
   FormGroup,
   Grid,
   Paper,
+  Snackbar,
   TextField,
   Typography
 } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
+
 import { H3, H4 } from 'browser-components/headers'
 import { RequestConfig } from 'browser/models/pipeline-config'
 import {
@@ -127,23 +131,17 @@ type SavedScript = {
   name?: string
 }
 
+type Pipeline = 'pubmed' | 'ner' | 'medGen' | 'uniProt'
+
 interface PipelineConfiguration {
   [key: string]: boolean
 }
 
-const StyledConnectionLabel = styled.label`
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 2;
-  * {
-    font-weight: normal;
-  }
-`
-
 const defaultRequestState: RequestConfig = {
   disease: '',
   numberOfArticles: 150,
+  deleteGraph: false,
+  deleteGraphPassword: '',
   pipelines: {
     medGen: {
       clinicalFeatures: true,
@@ -179,6 +177,7 @@ export function MainEditor({
   const [addFile] = useMutation(ADD_PROJECT_FILE)
   const [unsaved, setUnsaved] = useState(false)
   const [isRequestLoading, setIsRequestLoading] = useState(false)
+  const [showSnackbar, setShowSnackbar] = useState(false)
   const [isFullscreen, setFullscreen] = useState(false)
   const [currentlyEditing, setCurrentlyEditing] = useState<SavedScript | null>(
     null
@@ -323,6 +322,7 @@ export function MainEditor({
       })
 
       setIsRequestLoading(false)
+      setShowSnackbar(true)
     })()
   }
 
@@ -403,6 +403,10 @@ export function MainEditor({
                         <Checkbox
                           checked={pipelineConfig.pubmed.run}
                           name="run"
+                          disabled={isPipelineDisabled(
+                            requestConfiguration,
+                            'pubmed'
+                          )}
                           onChange={evt =>
                             handlePipelineChange({
                               pubmed: {
@@ -443,6 +447,10 @@ export function MainEditor({
                       control={
                         <Checkbox
                           checked={pipelineConfig.ner.run}
+                          disabled={isPipelineDisabled(
+                            requestConfiguration,
+                            'ner'
+                          )}
                           onChange={evt =>
                             handlePipelineChange({
                               ner: {
@@ -484,6 +492,10 @@ export function MainEditor({
                       control={
                         <Checkbox
                           checked={pipelineConfig.medGen.run}
+                          disabled={isPipelineDisabled(
+                            requestConfiguration,
+                            'medGen'
+                          )}
                           onChange={evt =>
                             handlePipelineChange({
                               medGen: {
@@ -543,6 +555,10 @@ export function MainEditor({
                         <Checkbox
                           checked={pipelineConfig.uniProt.run}
                           name="run"
+                          disabled={isPipelineDisabled(
+                            requestConfiguration,
+                            'uniProt'
+                          )}
                           onChange={evt =>
                             handlePipelineChange({
                               uniProt: {
@@ -560,19 +576,72 @@ export function MainEditor({
               </Grid>
             </Grid>
 
-            <FormButton
-              data-testid="connect"
+            <H4 style={{ marginTop: 16 }}>3. Configure Graph Merge</H4>
+            <Paper style={{ padding: 16, width: '50%' }}>
+              <Typography>
+                Specify whether the newly created graph should replace the
+                existing diagram (only possible with correct password) or
+                whether the new graph should be merged with the existing one.
+              </Typography>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={requestConfiguration.deleteGraph}
+                      name="Delete Graph"
+                      onChange={evt =>
+                        setRequestConfiguration({
+                          ...requestConfiguration,
+                          deleteGraph: evt.currentTarget.checked
+                        })
+                      }
+                    />
+                  }
+                  label="Delete Graph"
+                />
+              </FormGroup>
+              {requestConfiguration.deleteGraph && (
+                <TextField
+                  id="outlined-basic"
+                  label="Password"
+                  type="password"
+                  onChange={evt =>
+                    setRequestConfiguration({
+                      ...requestConfiguration,
+                      deleteGraphPassword: evt.currentTarget.value
+                    })
+                  }
+                  variant="outlined"
+                  value={requestConfiguration.deleteGraphPassword}
+                />
+              )}
+            </Paper>
+
+            <LoadingButton
+              onClick={handleSubmit}
               type="submit"
               disabled={isRequestLoading || requestConfiguration.disease == ''}
-              onClick={handleSubmit}
-              style={{
-                marginRight: 0,
-                marginTop: 8,
-                backgroundColor: isRequestLoading ? 'grey' : undefined
-              }}
+              loading={isRequestLoading}
+              loadingPosition="end"
+              variant="contained"
+              style={{ width: 200, marginTop: 8 }}
             >
               {isRequestLoading ? 'Creating Graph...' : 'Search'}
-            </FormButton>
+            </LoadingButton>
+            <Snackbar
+              open={showSnackbar}
+              autoHideDuration={6000}
+              onClose={() => setShowSnackbar(false)}
+              anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+            >
+              <Alert
+                onClose={() => setShowSnackbar(false)}
+                severity="success"
+                sx={{ width: '100%' }}
+              >
+                Successfully created Graph!
+              </Alert>
+            </Snackbar>
           </div>
         </>
       )}
@@ -733,6 +802,30 @@ function buildRequestJSON(requestConfiguration: RequestConfig) {
   // adjust to needed string Format
   tempJSON = tempJSON.replace('requestSpecs', 'request_specs')
   tempJSON = tempJSON.replace('numberOfArticles', 'n_articles')
+  tempJSON = tempJSON.replace('deleteGraphPassword', 'delete_graph_password')
+  tempJSON = tempJSON.replace('deleteGraph', 'delete_graph')
 
   return tempJSON
+}
+function isPipelineDisabled(
+  requestConfig: RequestConfig,
+  pipeline: Pipeline
+): boolean | undefined {
+  let disabledPipelines: Array<Pipeline> = ['ner', 'medGen', 'uniProt']
+  //sorry for the terrible code here..
+
+  if (requestConfig.pipelines.pubmed.run) {
+    disabledPipelines = ['medGen', 'uniProt']
+  }
+  if (requestConfig.pipelines.ner.run) {
+    disabledPipelines = ['pubmed', 'uniProt']
+  }
+  if (requestConfig.pipelines.medGen.run) {
+    disabledPipelines = ['pubmed', 'ner']
+  }
+  if (requestConfig.pipelines.uniProt.run) {
+    disabledPipelines = ['pubmed', 'ner', 'medGen']
+  }
+
+  return disabledPipelines.includes(pipeline)
 }
