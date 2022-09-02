@@ -24,6 +24,8 @@ import React, { Dispatch, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { withBus } from 'react-suber'
 import { Action } from 'redux'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
 import { Bus } from 'suber'
 
 import {
@@ -36,7 +38,9 @@ import {
   UpdateFileIcon
 } from 'browser-components/icons/LegacyIcons'
 import { isMac } from 'neo4j-arc/common'
-
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
 import {
   FormButton,
   FrameButton,
@@ -340,309 +344,307 @@ export function MainEditor({
     <MainEditorWrapper isFullscreen={isFullscreen} data-testid="activeEditor">
       {isConnected && (
         <>
-          <div style={{ padding: 8 }}>
-            <H3>{'Configure Graph'}</H3>
-
-            <H4 style={{ marginTop: 16 }}>1. Select Disease</H4>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Autocomplete
-                  freeSolo
-                  id="free-solo-2-demo"
-                  disableClearable
-                  style={{ width: '100%' }}
-                  options={staticDiseases}
-                  onChange={(evt, value) =>
-                    setRequestConfiguration({
-                      ...requestConfiguration,
-                      disease: value
-                    })
-                  }
-                  renderInput={params => (
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <H3>{'Configure Graph'}</H3>
+            </AccordionSummary>
+            <AccordionDetails>
+              <div style={{ padding: 8 }}>
+                <H4 style={{ marginTop: 16 }}>1. Select Disease</H4>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Autocomplete
+                      freeSolo
+                      id="free-solo-2-demo"
+                      disableClearable
+                      style={{ width: '100%' }}
+                      options={staticDiseases}
+                      onChange={(evt, value) =>
+                        setRequestConfiguration({
+                          ...requestConfiguration,
+                          disease: value
+                        })
+                      }
+                      renderInput={params => (
+                        <TextField
+                          {...params}
+                          label="Disease"
+                          key={params.id}
+                          InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                            onChange: evt =>
+                              setRequestConfiguration({
+                                ...requestConfiguration,
+                                disease: evt.currentTarget.value
+                              })
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
                     <TextField
-                      {...params}
-                      label="Disease"
-                      key={params.id}
-                      InputProps={{
-                        ...params.InputProps,
-                        type: 'search',
-                        onChange: evt =>
-                          setRequestConfiguration({
-                            ...requestConfiguration,
-                            disease: evt.currentTarget.value
-                          })
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField
-                  id="outlined-basic"
-                  label="Number of Articles"
-                  type="number"
-                  onChange={evt =>
-                    setRequestConfiguration({
-                      ...requestConfiguration,
-                      numberOfArticles: parseInt(evt.currentTarget.value)
-                    })
-                  }
-                  variant="outlined"
-                  value={requestConfiguration.numberOfArticles}
-                />
-              </Grid>
-            </Grid>
-            <H4 style={{ marginTop: 16 }}>2. Configure Pipelines</H4>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Paper style={{ padding: 16 }}>
-                  <Typography variant="h6">Pubmed</Typography>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.pubmed.run}
-                          name="run"
-                          disabled={isPipelineDisabled(
-                            requestConfiguration,
-                            'pubmed'
-                          )}
-                          onChange={evt =>
-                            handlePipelineChange({
-                              pubmed: {
-                                ...requestConfiguration.pipelines.pubmed,
-                                run: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Run"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.pubmed.meshTerms}
-                          name="meshterms"
-                          onChange={evt =>
-                            handlePipelineChange({
-                              pubmed: {
-                                ...requestConfiguration.pipelines.pubmed,
-                                meshTerms: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Meshterms"
-                    />
-                  </FormGroup>
-                </Paper>
-              </Grid>
-              <Grid item xs={3}>
-                <Paper style={{ padding: 16 }}>
-                  <Typography variant="h6">NER</Typography>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.ner.run}
-                          disabled={isPipelineDisabled(
-                            requestConfiguration,
-                            'ner'
-                          )}
-                          onChange={evt =>
-                            handlePipelineChange({
-                              ner: {
-                                ...requestConfiguration.pipelines.ner,
-                                run: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                          name="ner-run"
-                        />
-                      }
-                      label="Run"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.ner.entityLinks}
-                          name="ner-entity-links"
-                          onChange={evt =>
-                            handlePipelineChange({
-                              ner: {
-                                ...requestConfiguration.pipelines.ner,
-                                entityLinks: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Entity Links"
-                    />
-                  </FormGroup>
-                </Paper>
-              </Grid>
-              <Grid item xs={3}>
-                <Paper style={{ padding: 16 }}>
-                  <Typography variant="h6">MedGen</Typography>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.medGen.run}
-                          disabled={isPipelineDisabled(
-                            requestConfiguration,
-                            'medGen'
-                          )}
-                          onChange={evt =>
-                            handlePipelineChange({
-                              medGen: {
-                                ...requestConfiguration.pipelines.medGen,
-                                run: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                          name="run"
-                        />
-                      }
-                      label="Run"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.medGen.Snomed}
-                          name="snomed"
-                          onChange={evt =>
-                            handlePipelineChange({
-                              medGen: {
-                                ...requestConfiguration.pipelines.medGen,
-                                Snomed: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Snomed"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.medGen.clinicalFeatures}
-                          name="clinicalFeatures"
-                          onChange={evt =>
-                            handlePipelineChange({
-                              medGen: {
-                                ...requestConfiguration.pipelines.medGen,
-                                clinicalFeatures: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Clinical Features"
-                    />
-                  </FormGroup>
-                </Paper>
-              </Grid>
-              <Grid item xs={3}>
-                <Paper style={{ padding: 16 }}>
-                  <Typography variant="h6">uniProt</Typography>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={pipelineConfig.uniProt.run}
-                          name="run"
-                          disabled={isPipelineDisabled(
-                            requestConfiguration,
-                            'uniProt'
-                          )}
-                          onChange={evt =>
-                            handlePipelineChange({
-                              uniProt: {
-                                ...requestConfiguration.pipelines.uniProt,
-                                run: evt.currentTarget.checked
-                              }
-                            })
-                          }
-                        />
-                      }
-                      label="Run"
-                    />
-                  </FormGroup>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            <H4 style={{ marginTop: 16 }}>3. Configure Graph Merge</H4>
-            <Paper style={{ padding: 16, width: '50%' }}>
-              <Typography>
-                Specify whether the newly created graph should replace the
-                existing diagram (only possible with correct password) or
-                whether the new graph should be merged with the existing one.
-              </Typography>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={requestConfiguration.deleteGraph}
-                      name="Delete Graph"
+                      id="outlined-basic"
+                      label="Number of Articles"
+                      type="number"
                       onChange={evt =>
                         setRequestConfiguration({
                           ...requestConfiguration,
-                          deleteGraph: evt.currentTarget.checked
+                          numberOfArticles: parseInt(evt.currentTarget.value)
                         })
                       }
+                      variant="outlined"
+                      value={requestConfiguration.numberOfArticles}
                     />
-                  }
-                  label="Delete Graph"
-                />
-              </FormGroup>
-              {requestConfiguration.deleteGraph && (
-                <TextField
-                  id="outlined-basic"
-                  label="Password"
-                  type="password"
-                  onChange={evt =>
-                    setRequestConfiguration({
-                      ...requestConfiguration,
-                      deleteGraphPassword: evt.currentTarget.value
-                    })
-                  }
-                  variant="outlined"
-                  value={requestConfiguration.deleteGraphPassword}
-                />
-              )}
-            </Paper>
+                  </Grid>
+                </Grid>
+                <H4 style={{ marginTop: 16 }}>2. Configure Pipelines</H4>
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    <Paper style={{ padding: 16 }}>
+                      <Typography variant="h6">Pubmed</Typography>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.pubmed.run}
+                              name="run"
+                              disabled={isPipelineDisabled(
+                                requestConfiguration,
+                                'pubmed'
+                              )}
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  pubmed: {
+                                    ...requestConfiguration.pipelines.pubmed,
+                                    run: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Run"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.pubmed.meshTerms}
+                              name="meshterms"
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  pubmed: {
+                                    ...requestConfiguration.pipelines.pubmed,
+                                    meshTerms: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Meshterms"
+                        />
+                      </FormGroup>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Paper style={{ padding: 16 }}>
+                      <Typography variant="h6">NER</Typography>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.ner.run}
+                              disabled={isPipelineDisabled(
+                                requestConfiguration,
+                                'ner'
+                              )}
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  ner: {
+                                    ...requestConfiguration.pipelines.ner,
+                                    run: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                              name="ner-run"
+                            />
+                          }
+                          label="Run"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.ner.entityLinks}
+                              name="ner-entity-links"
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  ner: {
+                                    ...requestConfiguration.pipelines.ner,
+                                    entityLinks: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Entity Links"
+                        />
+                      </FormGroup>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Paper style={{ padding: 16 }}>
+                      <Typography variant="h6">MedGen</Typography>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.medGen.run}
+                              disabled={isPipelineDisabled(
+                                requestConfiguration,
+                                'medGen'
+                              )}
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  medGen: {
+                                    ...requestConfiguration.pipelines.medGen,
+                                    run: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                              name="run"
+                            />
+                          }
+                          label="Run"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.medGen.Snomed}
+                              name="snomed"
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  medGen: {
+                                    ...requestConfiguration.pipelines.medGen,
+                                    Snomed: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Snomed"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.medGen.clinicalFeatures}
+                              name="clinicalFeatures"
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  medGen: {
+                                    ...requestConfiguration.pipelines.medGen,
+                                    clinicalFeatures: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Clinical Features"
+                        />
+                      </FormGroup>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Paper style={{ padding: 16 }}>
+                      <Typography variant="h6">uniProt</Typography>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pipelineConfig.uniProt.run}
+                              name="run"
+                              disabled={isPipelineDisabled(
+                                requestConfiguration,
+                                'uniProt'
+                              )}
+                              onChange={evt =>
+                                handlePipelineChange({
+                                  uniProt: {
+                                    ...requestConfiguration.pipelines.uniProt,
+                                    run: evt.currentTarget.checked
+                                  }
+                                })
+                              }
+                            />
+                          }
+                          label="Run"
+                        />
+                      </FormGroup>
+                    </Paper>
+                  </Grid>
+                </Grid>
 
-            <LoadingButton
-              onClick={handleSubmit}
-              type="submit"
-              disabled={isRequestLoading || requestConfiguration.disease == ''}
-              loading={isRequestLoading}
-              loadingPosition="end"
-              variant="contained"
-              style={{ width: 200, marginTop: 8 }}
-            >
-              {isRequestLoading ? 'Creating Graph...' : 'Search'}
-            </LoadingButton>
-            <Snackbar
-              open={showSnackbar}
-              autoHideDuration={6000}
-              onClose={() => setShowSnackbar(false)}
-              anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
-            >
-              <Alert
-                onClose={() => setShowSnackbar(false)}
-                severity="success"
-                sx={{ width: '100%' }}
-              >
-                Successfully created Graph!
-              </Alert>
-            </Snackbar>
-          </div>
+                <H4 style={{ marginTop: 16 }}>3. Configure Graph Merge</H4>
+                <Paper style={{ padding: 16, width: '50%' }}>
+                  <Typography>
+                    Specify whether the newly created graph should replace the
+                    existing diagram (only possible with correct password) or
+                    whether the new graph should be merged with the existing
+                    one.
+                  </Typography>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={requestConfiguration.deleteGraph}
+                          name="Delete Graph"
+                          onChange={evt =>
+                            setRequestConfiguration({
+                              ...requestConfiguration,
+                              deleteGraph: evt.currentTarget.checked
+                            })
+                          }
+                        />
+                      }
+                      label="Delete Graph"
+                    />
+                  </FormGroup>
+                  {requestConfiguration.deleteGraph && (
+                    <TextField
+                      id="outlined-basic"
+                      label="Password"
+                      type="password"
+                      onChange={evt =>
+                        setRequestConfiguration({
+                          ...requestConfiguration,
+                          deleteGraphPassword: evt.currentTarget.value
+                        })
+                      }
+                      variant="outlined"
+                      value={requestConfiguration.deleteGraphPassword}
+                    />
+                  )}
+                </Paper>
+
+                <LoadingButton
+                  onClick={handleSubmit}
+                  type="submit"
+                  disabled={
+                    isRequestLoading || requestConfiguration.disease == ''
+                  }
+                  loading={isRequestLoading}
+                  loadingPosition="end"
+                  variant="contained"
+                  style={{ width: 200, marginTop: 8 }}
+                >
+                  {isRequestLoading ? 'Creating Graph...' : 'Search'}
+                </LoadingButton>
+              </div>
+            </AccordionDetails>
+          </Accordion>
         </>
       )}
       {currentlyEditing && (
@@ -762,6 +764,20 @@ export function MainEditor({
           ))}
         </StyledMainEditorButtonsContainer>
       </FlexContainer>
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setShowSnackbar(false)}
+        anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+      >
+        <Alert
+          onClose={() => setShowSnackbar(false)}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Successfully created Graph!
+        </Alert>
+      </Snackbar>
     </MainEditorWrapper>
   )
 }
