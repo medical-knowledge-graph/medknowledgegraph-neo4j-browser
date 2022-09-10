@@ -377,6 +377,12 @@ export function MainEditor({
               <div style={{ padding: 8 }}>
                 <H4>Active Searchterms</H4>
                 <Paper style={{ padding: 8 }}>
+                  {activeSearchTerms.length === 0 && (
+                    <Chip
+                      style={{ marginRight: 4, marginTop: 4 }}
+                      label={'Empty Graph'}
+                    />
+                  )}
                   {activeSearchTerms.map(term => (
                     <Chip
                       color="primary"
