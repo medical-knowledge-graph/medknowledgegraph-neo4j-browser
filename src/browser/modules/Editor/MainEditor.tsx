@@ -18,16 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { useMutation } from '@apollo/client'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CypherEditor } from 'neo4j-arc/cypher-language-support'
 import { QueryResult } from 'neo4j-driver'
 import React, { Dispatch, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { withBus } from 'react-suber'
 import { Action } from 'redux'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { Bus } from 'suber'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import {
+  FrameButton,
+  StyledEditorButton,
+  StyledMainEditorButtonsContainer
+} from 'browser-components/buttons'
 import {
   CloseIcon,
   ContractIcon,
@@ -37,22 +45,13 @@ import {
   RunIcon,
   UpdateFileIcon
 } from 'browser-components/icons/LegacyIcons'
-import { isMac } from 'neo4j-arc/common'
-import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import {
-  FormButton,
-  FrameButton,
-  StyledEditorButton,
-  StyledMainEditorButtonsContainer
-} from 'browser-components/buttons'
 import {
   ADD_PROJECT_FILE,
   REMOVE_PROJECT_FILE
 } from 'browser-components/ProjectFiles/projectFilesConstants'
 import { getProjectFileDefaultFileName } from 'browser-components/ProjectFiles/projectFilesUtils'
 import { defaultNameFromDisplayContent } from 'browser-components/SavedScripts'
+import { isMac } from 'neo4j-arc/common'
 import {
   CurrentEditIconContainer,
   EditorContainer,
@@ -90,10 +89,12 @@ import {
   shouldEnableMultiStatementMode
 } from 'shared/modules/settings/settingsDuck'
 
+import { LoadingButton } from '@mui/lab'
 import {
   Alert,
   Autocomplete,
   Checkbox,
+  Chip,
   FormControlLabel,
   FormGroup,
   Grid,
@@ -102,7 +103,6 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { LoadingButton } from '@mui/lab'
 
 import { H3, H4 } from 'browser-components/headers'
 import { RequestConfig } from 'browser/models/pipeline-config'
@@ -111,7 +111,6 @@ import {
   printShortcut
 } from 'browser/modules/App/keyboardShortcuts'
 import { staticDiseases } from 'browser/static/diseases'
-import styled from 'styled-components'
 
 type EditorFrameProps = {
   bus: Bus
@@ -186,6 +185,7 @@ export function MainEditor({
   const [currentlyEditing, setCurrentlyEditing] = useState<SavedScript | null>(
     null
   )
+  const [activeSearchTerms, setActiveSearchTerms] = useState<string[]>([])
   const [requestConfiguration, setRequestConfiguration] =
     useState<RequestConfig>(defaultRequestState)
 
@@ -261,10 +261,30 @@ export function MainEditor({
     [bus]
   )
 
+  useEffect(() => {
+    fetchSearchTerms()
+  }, [])
+
   function discardEditor() {
     editorRef.current?.setValue('')
     setCurrentlyEditing(null)
     setFullscreen(false)
+  }
+
+  const fetchSearchTerms = async () => {
+    const response = await fetch('https://dzkj.fordo.de/searchTerms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ token: 'gTROnCD7nMeifPU' })
+    })
+    const json = await response.json()
+    const searchterms = json['searchTerms']
+    if (searchterms !== undefined) {
+      setActiveSearchTerms(searchterms)
+    }
   }
 
   const buttons = [
@@ -316,7 +336,7 @@ export function MainEditor({
     setIsRequestLoading(true)
     const requestJSON = buildRequestJSON(requestConfiguration)
     ;(async () => {
-      await fetch('https://dzkj.fordo.de/', {
+      await fetch('https://dzkj.fordo.de/buildGraph', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -327,6 +347,7 @@ export function MainEditor({
 
       setIsRequestLoading(false)
       setShowSnackbar(true)
+      fetchSearchTerms()
     })()
   }
 
@@ -354,6 +375,17 @@ export function MainEditor({
             </AccordionSummary>
             <AccordionDetails>
               <div style={{ padding: 8 }}>
+                <H4>Active Searchterms</H4>
+                <Paper style={{ padding: 8 }}>
+                  {activeSearchTerms.map(term => (
+                    <Chip
+                      color="primary"
+                      style={{ marginRight: 4, marginTop: 4 }}
+                      label={term}
+                      key={term}
+                    />
+                  ))}
+                </Paper>
                 <H4 style={{ marginTop: 16 }}>1. Select Disease</H4>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
@@ -591,9 +623,8 @@ export function MainEditor({
                 <Paper style={{ padding: 16, width: '50%' }}>
                   <Typography>
                     Specify whether the newly created graph should replace the
-                    existing diagram (only possible with correct password) or
-                    whether the new graph should be merged with the existing
-                    one.
+                    existing graph (only possible with correct password) or if
+                    it should be merged with the existing graph.
                   </Typography>
                   <FormGroup>
                     <FormControlLabel
@@ -638,7 +669,7 @@ export function MainEditor({
                   loading={isRequestLoading}
                   loadingPosition="end"
                   variant="contained"
-                  style={{ width: 200, marginTop: 8 }}
+                  style={{ width: 200, marginTop: 16 }}
                 >
                   {isRequestLoading ? 'Creating Graph...' : 'Search'}
                 </LoadingButton>
