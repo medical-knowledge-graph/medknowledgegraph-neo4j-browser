@@ -518,6 +518,10 @@ export function MainEditor({
                             <Checkbox
                               checked={pipelineConfig.ner.entityLinks}
                               name="ner-entity-links"
+                              disabled={isPipelineDisabled(
+                                requestConfiguration,
+                                'ner'
+                              )}
                               onChange={evt =>
                                 handlePipelineChange({
                                   ner: {
@@ -872,6 +876,12 @@ function isPipelineDisabled(
   }
   if (requestConfig.pipelines.ner.run) {
     disabledPipelines = ['pubmed', 'uniProt']
+  }
+  if (
+    requestConfig.pipelines.ner &&
+    requestConfig.pipelines.ner.entityLinks === false
+  ) {
+    disabledPipelines = ['pubmed', 'medGen', 'uniProt']
   }
   if (requestConfig.pipelines.medGen.run) {
     disabledPipelines = ['pubmed', 'ner']
