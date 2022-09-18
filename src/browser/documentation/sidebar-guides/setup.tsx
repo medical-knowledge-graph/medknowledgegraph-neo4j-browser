@@ -36,10 +36,18 @@ const slides = [
       authenticated connection with the following credentials:
     </p>
     <ul className="big">
-      <li>Connect URL: neo4j+s://52b536dd.databases.neo4j.io:7687</li>
-      <li>Authentication type: Username / Password</li>
-      <li>Username: Assigned Username</li>
-      <li>Password: Assigned Password</li>
+      <li>
+        <b>Connect URL:</b> neo4j+s://52b536dd.databases.neo4j.io:7687
+      </li>
+      <li>
+        <b>Authentication type:</b> Username / Password
+      </li>
+      <li>
+        <b>Username:</b> Assigned Username
+      </li>
+      <li>
+        <b>Password:</b> Assigned Password
+      </li>
     </ul>
     <p style={{ marginTop: '16px' }}>
       Click on the "Connect" button to establish a connection
@@ -76,7 +84,8 @@ const slides = [
     <p className="lead">
       <em>
         After successful login, you are a ready to make your first request! You
-        have three different options to configure the request:
+        have three different options to configure the request. You can expand
+        and collapse the panel via the icon and the right upper corner.
       </em>
     </p>
     <ol>
@@ -118,10 +127,16 @@ const slides = [
     <ul>
       <li>
         <b>PubMed:</b> This pipeline gets all relevant articles
+      </li>
+      <li>
         <b>UniProt:</b> Allows access to resource of protein sequence and
         functional information
+      </li>
+      <li>
         <b>MedGen:</b> Here informations about conditions and phenotypes related
         to medical genetics can be requested.
+      </li>
+      <li>
         <b>NER:</b> Named Entity Recognition to extract named entities based on
         SciSpacy BC5CDR
       </li>

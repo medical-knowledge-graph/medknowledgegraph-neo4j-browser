@@ -367,7 +367,7 @@ export function MainEditor({
         <>
           <Accordion defaultExpanded>
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ExpandMoreIcon color="primary" />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
