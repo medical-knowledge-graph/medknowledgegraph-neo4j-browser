@@ -76,7 +76,14 @@ const slides = [
     </p>
 
     <br />
-    <img src="./assets/images/knowledge_graph.png" className="img-responsive" />
+    <img src="./assets/images/graphStructure.png" className="img-responsive" />
+    <br />
+  </BuiltInGuideSidebarSlide>,
+  <BuiltInGuideSidebarSlide key="s2">
+    <h3>Overview of nodes in Knowledge Graph</h3>
+
+    <br />
+    <img src="./assets/images/nodes.png" className="img-responsive" />
     <br />
   </BuiltInGuideSidebarSlide>,
   <BuiltInGuideSidebarSlide key="s3">
@@ -142,7 +149,7 @@ const slides = [
       </li>
     </ul>
     <br />
-    <img src="./assets/images/architecture.png" className="img-responsive" />
+    <img src="./assets/images/architecture.jpeg" className="img-responsive" />
     <br />
   </BuiltInGuideSidebarSlide>,
   <BuiltInGuideSidebarSlide key="s5">
