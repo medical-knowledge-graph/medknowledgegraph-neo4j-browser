@@ -22,6 +22,8 @@ const path = require('path')
 const getPlugins = require('./webpack-plugins')
 const rules = require('./webpack-rules')
 const helpers = require('./webpack-helpers')
+const Dotenv = require('dotenv-webpack');
+
 
 module.exports = {
   mode: helpers.isProduction ? 'production' : 'development',
@@ -36,7 +38,7 @@ module.exports = {
     path: helpers.buildPath,
     globalObject: 'this'
   },
-  plugins: getPlugins(),
+  plugins: [...getPlugins(),new Dotenv()],
   resolve: {
     symlinks: false,
     alias: {

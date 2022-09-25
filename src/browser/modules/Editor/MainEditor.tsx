@@ -272,14 +272,15 @@ export function MainEditor({
   }
 
   const fetchSearchTerms = async () => {
-    const response = await fetch('https://dzkj.fordo.de/searchTerms', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ token: 'gTROnCD7nMeifPU' })
-    })
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/searchTerms?token=gTROnCD7nMeifP`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    )
     const json = await response.json()
     const searchterms = json['searchTerms']
     if (searchterms !== undefined) {
@@ -313,6 +314,8 @@ export function MainEditor({
     }
   }
 
+  console.log(process.env.API_BASE_URL)
+
   function getName({ name, content, isProjectFile }: SavedScript) {
     if (name) {
       return name
@@ -336,7 +339,7 @@ export function MainEditor({
     setIsRequestLoading(true)
     const requestJSON = buildRequestJSON(requestConfiguration)
     ;(async () => {
-      await fetch('https://dzkj.fordo.de/buildGraph', {
+      await fetch(`${process.env.API_BASE_URL}/buildGraph`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
