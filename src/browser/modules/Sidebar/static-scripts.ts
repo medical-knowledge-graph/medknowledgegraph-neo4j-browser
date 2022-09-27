@@ -31,7 +31,6 @@ import * as editor from 'shared/modules/editor/editorDuck'
 const mapFavoritesStateToProps = (state: any) => {
   const version = semver.coerce(getVersion(state) || '0') ?? '0'
   const folders = getFolders(state).filter(folder => folder.isStatic)
-  console.log('folders', folders)
   const scripts = favorites
     .getFavorites(state)
     .filter(
