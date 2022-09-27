@@ -273,7 +273,7 @@ export function MainEditor({
 
   const fetchSearchTerms = async () => {
     const response = await fetch(
-      `${process.env.API_BASE_URL}/searchTerms?token=gTROnCD7nMeifP`,
+      `${process.env.API_BASE_URL}/searchTerms?token=gTROnCD7nMeifPU`,
       {
         headers: {
           'Content-Type': 'application/json',
