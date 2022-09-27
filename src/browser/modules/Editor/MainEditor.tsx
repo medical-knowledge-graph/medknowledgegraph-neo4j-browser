@@ -314,8 +314,6 @@ export function MainEditor({
     }
   }
 
-  console.log(process.env.API_BASE_URL)
-
   function getName({ name, content, isProjectFile }: SavedScript) {
     if (name) {
       return name
